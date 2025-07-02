@@ -42,6 +42,30 @@ namespace TokenDump
 
                 foreach (string token in tokens)
                 {
+                    // Decode base64 url token payload
+                    string base64 = token.Split('.')[1].Replace('-', '+').Replace('_', '/');
+                    switch (base64.Length % 4)
+                    {
+                        case 2: base64 += "=="; break;
+                        case 3: base64 += "="; break;
+                    }
+                    JSONNode json = JSON.Parse(Encoding.UTF8.GetString(Convert.FromBase64String(base64)));
+
+                    DateTime
+                        iat = DateTimeOffset.FromUnixTimeSeconds(json["iat"].AsLong).UtcDateTime,
+                        nbf = DateTimeOffset.FromUnixTimeSeconds(json["nbf"].AsLong).UtcDateTime,
+                        exp = DateTimeOffset.FromUnixTimeSeconds(json["exp"].AsLong).UtcDateTime;
+
+                    Print.Info("SteamID64: " + json["sub"].Value);
+
+                    Print.Info("Issued At:  " + iat);
+                    Print.Info("Not Before: " + nbf);
+                    Print.Info("Expiration: " + exp);
+
+                    Print.Info("Logged IP: " + json["ip_subject"].Value);
+                    Print.Info("Guard IP: " + json["ip_confirmer"].Value);
+                   
+                    
                     if (saveEnabled)
                     {
                         File.AppendAllText(saveToFile, token + "\n\n");

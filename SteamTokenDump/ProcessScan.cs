@@ -58,24 +58,17 @@ namespace TokenDump
                     if (currentString.Length > 0)
                     {
                         string result = currentString.ToString();
-                        if (regex.IsMatch(result))
+                        foreach (Match m in regex.Matches(result))
                         {
-                            matchedStrings.Add(result);
+                            if (!matchedStrings.Contains(m.Value))
+                            {
+                                matchedStrings.Add(m.Value);
+                            }
                         }
                     }
                     currentString.Clear();
                 }
             }
-
-            if (currentString.Length > 0)
-            {
-                string result = currentString.ToString();
-                if (regex.IsMatch(result))
-                {
-                    matchedStrings.Add(result);
-                }
-            }
-
             return matchedStrings;
         }
 
